@@ -22,7 +22,7 @@ exports.create_board = [
 	body('uri').isAlphanumeric().trim().withMessage('Invalid Characters'),
 	body('uri').isLowercase().trim().withMessage('URI must be lowercase'),
 	body('title').isLength({ min: 1 }).trim().withMessage('No text entered'),
-	body('title').isLength({ min: 40 }).trim().withMessage('Too many characters'),
+	body('title').isLength({ max: 40 }).trim().withMessage('Too many characters'),
 	
 	//sanatize
 	sanitizeBody('uri').trim().escape(),
@@ -34,7 +34,7 @@ exports.create_board = [
 		const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
-			res.send(errors);
+			console.log(JSON.stringify(errors));
 		}
 		else{
 			//Data is valid
@@ -42,7 +42,7 @@ exports.create_board = [
 			//Create new reply object with sanatized data
 			const board = new Board(
 				{
-					uri: req.body.name,
+					uri: req.body.uri,
 					title: req.body.title
 				});
 			board.save(function (err) {

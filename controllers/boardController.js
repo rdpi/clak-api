@@ -86,18 +86,13 @@ exports.create_thread = [
 				});
 			thread.save(function (err, threadid) {
 				if (err) {return next(err); console.log(err);}
-				Thread.findByIdAndUpdate(threadid, {bump: threadid});
-				//move the last thread to the archive
+				//prune last thread
 				Thread.countDocuments({board: req.params.boardid}, function(err, count){
 					if (err) {return next(err)}
 					console.log(count);
-					if (count > 5){
+					if (count > 10){
 						console.log("Over thread limit")
-						Thread.find({board: req.params.boardid}).sort({bump: 1}).exec( function (err, deadThread){
-							if (err) {return next(err)};
-								console.log(deadThread[0]);
-								Thread.deleteOne({_id: deadThread[0]._id})
-						});
+						Thread.findOneAndDelete({ "board": req.params.boardid}, {sort: {"bump": 1}}).exec()
 					}
 				});
 			});

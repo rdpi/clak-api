@@ -91,9 +91,16 @@ exports.reply_create_post = [
 				//update reply count and bump level
 				Reply.countDocuments({thread: req.params.threadid}, function(err, count){
 					if (err) { return next(err)}
-					Reply.findById(replyid, 'date').then(newReply => 
-					Thread.findByIdAndUpdate(req.params.threadid, {replies: count, bump: newReply.date}))
-					.then(result => console.log(result));
+					//don't bump the thread 
+					if(count < 10){
+						Reply.findById(replyid, 'date').then(newReply => 
+						Thread.findByIdAndUpdate(req.params.threadid, {replies: count, bump: newReply.date}))
+						.then(result => console.log(result));
+					}
+					else{
+						Thread.findByIdAndUpdate(req.params.threadid, {replies: count})
+						.then(result => console.log(result));
+					}
 				});
 			});
 
