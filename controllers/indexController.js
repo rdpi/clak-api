@@ -2,12 +2,8 @@ const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 
 var Board = require('../models/board'); 
-var Thread = require('../models/thread');
-var Reply = require('../models/reply');
-var mongoose = require('mongoose');
-var async = require('async');
-var moment = require('moment');
 
+//Get a list of boards
 exports.get_boards = function(req, res, next) {
 	Board.find()
 		.exec( function(err, board_list) {
@@ -16,13 +12,20 @@ exports.get_boards = function(req, res, next) {
 			res.json({boards: board_list});
 		});
 };
+
+//Create a new board
 exports.create_board = [
+
 	//validate
-	body('name').isLength({ min: 1 }).trim().withMessage('No text entered'),
+	body('uri').isLength({ min: 1 }).trim().withMessage('No text entered'),
+	body('uri').isLength({ max: 30 }).trim().withMessage('Too many characters'),
+	body('uri').isAlphanumeric().trim().withMessage('Invalid Characters'),
+	body('uri').isLowercase().trim().withMessage('URI must be lowercase'),
 	body('title').isLength({ min: 1 }).trim().withMessage('No text entered'),
+	body('title').isLength({ min: 40 }).trim().withMessage('Too many characters'),
 	
 	//sanatize
-	sanitizeBody('name').trim().escape(),
+	sanitizeBody('uri').trim().escape(),
 	sanitizeBody('title').trim().escape(),
 
 	//process next request
@@ -31,20 +34,20 @@ exports.create_board = [
 		const errors = validationResult(req);
 
 		if (!errors.isEmpty()) {
-			res.render('index', {title: 'REEE', errors: errors.array()});
+			res.send(errors);
 		}
 		else{
 			//Data is valid
 			
 			//Create new reply object with sanatized data
-			var board = new Board(
+			const board = new Board(
 				{
-					name: req.body.name,
+					uri: req.body.name,
 					title: req.body.title
 				});
 			board.save(function (err) {
 				if (err) {return next(err); }
-				res.redirect('/')
+				res.sendStatus(201);
 			});
 		}
 	}

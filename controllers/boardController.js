@@ -43,7 +43,7 @@ exports.create_thread = [
 	//validate
 	body('body').isLength({ max: 2000 }).trim().withMessage('Field too long'),
 	body('name').isLength({ max: 30 }).trim().withMessage('Field too long'),
-	body('subject').isLength({ max: 350 }).trim().withMessage('Field too long'),
+	body('subject').isLength({ max: 100 }).trim().withMessage('Field too long'),
 	
 	//sanatize
 	sanitizeBody('name').trim().escape(),
@@ -92,7 +92,8 @@ exports.create_thread = [
 					if (err) {return next(err)}
 					console.log(count);
 					if (count > 5){
-						Thread.find().sort({bump: 1}).exec( function (err, deadThread){
+						console.log("Over thread limit")
+						Thread.find({board: req.params.boardid}).sort({bump: 1}).exec( function (err, deadThread){
 							if (err) {return next(err)};
 								console.log(deadThread[0]);
 								Thread.deleteOne({_id: deadThread[0]._id})

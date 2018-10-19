@@ -4,22 +4,10 @@ var Schema = mongoose.Schema;
 
 var BoardSchema = new Schema(
 	{
-		name: {type: String, unique: true, required: true},
-		title: {type: String, required: true}
+		uri: {type: String, unique: true, min: 1, max: 30, required: true},
+		title: {type: String, min: 1, max: 40, required: true}
 	}
 );
-
-BoardSchema
-.virtual('url')
-.get(function () {
-	return '/' + this._id +'/';
-});
-
-BoardSchema
-.virtual('label')
-.get(function () {
-	return '/'+this.name+'/ - '+this.title;
-});
 
 module.exports = mongoose.model('Board', BoardSchema);
 
