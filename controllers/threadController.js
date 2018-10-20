@@ -17,25 +17,17 @@ cloudinary.config({
 
 exports.thread_detail = function(req, res, next) {
 
-	async.parallel({
-		thread: function(callback){
-			Thread.findById(req.params.threadid)
-			.exec(callback)
-		},
-		replies: function(callback){
-			Reply.find({ 'thread': req.params.threadid}, 'name body date media')
-			.exec(callback)
-		},
-	}, function(err, results) {
-		if (err) {return next(err); } //Error in API usage
-		if (results.thread==null) {
-			var err = new Error('Thread not found');
+	Thread.findOne({_id: req.params.threadid}).exec( (err, thread) => {
+		if (err){return next(err)}
+		if (thread == null){
+			const err = new Error('Thread not found');
 			err.status = 404;
 			return next(err);
 		}
-		//send thread info, and array of replies
-		res.json({thread: results.thread, replies: results.replies });
-	});
+		Reply.find({'thread': req.params.threadid}).exec((err, replies) => {
+			res.json({thread: thread, replies: replies})
+		})
+	})
 };
 
 exports.reply_create_post = [
@@ -59,16 +51,29 @@ exports.reply_create_post = [
 		}
 		else{
 			//Data is valid
-			//is there a file?
-			let mediaURL = null;
-			console.log(req.files);
+
+			//object to store file data
+			let filedata = {
+				file_id: null,
+				filename: null,
+				filesize: null,
+				width: null,
+				height: null,
+				ext: null
+			}
 			if (Object.keys(req.files).length !== 0){
 				const values = Object.values(req.files);
   				const promises = values.map(image => cloudinary.uploader.upload(image.path,
     			function(error, result) {console.log(result, error)}));
-
+				console.log(req.files.file.originalFilename);
   				let results = await Promise.all(promises);
-    			mediaURL = (results[0].public_id);
+
+    			filedata.file_id = (results[0].public_id);
+				filedata.filename = (req.files.file.originalFilename);
+				filedata.filesize = (results[0].bytes);
+				filedata.width = (results[0].width);
+				filedata.height = (results[0].height);
+				filedata.ext = (results[0].format);
 			}
 
 			//post must have at least an image or a message
@@ -83,8 +88,13 @@ exports.reply_create_post = [
 					thread: mongoose.Types.ObjectId(req.params.threadid),
 					name: req.body.name === "" ? "Anonymous" : req.body.name,
 					body: req.body.body,
-					media: mediaURL,
-					sage: req.body.sage
+					file_id: filedata.file_id,
+					filename: filedata.filename,
+					filesize: filedata.filesize,
+					width: filedata.width,
+					height: filedata.height,
+					ext: filedata.ext
+
 				});
 			reply.save(function (err, replyid) {
 				if (err) {return next(err); }

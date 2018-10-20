@@ -18,24 +18,18 @@ cloudinary.config({
 
 exports.get_threads = function(req, res, next) {
 
-	async.parallel({
-		board: function(callback){
-			Board.findById(req.params.boardid)
-			.exec(callback)
-		},
-		threads: function(callback){
-			Thread.find({ 'board': req.params.boardid })
-			.exec(callback)
-		},
-	}, function(err, results) {
-		if (err) {return next(err); } //Error in API usage
-		if (results.board==null) {
+	Board.findOne({uri: req.params.boardid}).exec( (err, board) => {
+		if (err){ return next(err)}
+		if (board == null){
 			var err = new Error('Board not found');
 			err.status = 404;
 			return next(err);
 		}
-		res.json({board: results.board, threads: results.threads});
-	});
+		Thread.find({'board': board._id}).exec( (err, threads) => {
+			if (err){ return next(err)}
+			res.json({board: board, threads: threads})
+		})
+	})
 };
 
 
@@ -60,15 +54,29 @@ exports.create_thread = [
 		}
 		else{
 			//Data is valid
-			let mediaURL = null;
+			
+			//object to store file data
+			let filedata = {
+				file_id: null,
+				filename: null,
+				filesize: null,
+				width: null,
+				height: null,
+				ext: null
+			}
 			console.log(req.files);
 			if (Object.keys(req.files).length !== 0){
 				const values = Object.values(req.files);
   				const promises = values.map(image => cloudinary.uploader.upload(image.path,
     			function(error, result) {console.log(result, error)}));
-
+				console.log(req.files.file.originalFilename);
   				let results = await Promise.all(promises);
-    			mediaURL = (results[0].public_id);
+    			filedata.file_id = (results[0].public_id);
+				filedata.filename = (req.files.file.originalFilename);
+				filedata.filesize = (results[0].bytes);
+				filedata.width = (results[0].width);
+				filedata.height = (results[0].height);
+				filedata.ext = (results[0].format);
 			}
 			else{
 				var err = new Error('No file selected');
@@ -82,7 +90,13 @@ exports.create_thread = [
 					name: req.body.name === "" ? "Anonymous" : req.body.name,
 					subject: req.body.subject,
 					body: req.body.body,
-					media: mediaURL,
+					file_id: filedata.file_id,
+					filename: filedata.filename,
+					filesize: filedata.filesize,
+					width: filedata.width,
+					height: filedata.height,
+					ext: filedata.ext
+
 				});
 			thread.save(function (err, threadid) {
 				if (err) {return next(err); console.log(err);}

@@ -9,8 +9,12 @@ var ReplySchema = new Schema(
 		name: {type: String, default: "Anonymous"},
 		body: {type: String, required: true},
 		date: {type: Date, default: Date.now, required: true},
-		media: {type: String},
-		sage: {type: Boolean, default: false}
+		file_id: {type: String},
+		filename: {type: String},
+		filesize: {type: Number},
+		width: {type: Number},
+		height: {type: Number},
+		ext: {type: String}
 	}
 );
 
