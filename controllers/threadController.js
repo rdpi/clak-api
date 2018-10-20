@@ -9,6 +9,8 @@ var async = require('async');
 var moment = require('moment');
 const cloudinary = require('cloudinary');
 
+const REPLY_LIMIT = 10;
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -98,19 +100,16 @@ exports.reply_create_post = [
 				});
 			reply.save(function (err, replyid) {
 				if (err) {return next(err); }
-				//update reply count and bump level
-				Reply.countDocuments({thread: req.params.threadid}, function(err, count){
-					if (err) { return next(err)}
-					//don't bump the thread 
-					if(count < 10){
+
+				//update reply count
+				Thread.findByIdAndUpdate(req.params.threadid, { $inc: { replies: 1}}).exec( (err, thread) => {
+					if (err) {return next(err)};
+					//don't bump the thread if we're over the reply limit, or if there's sage
+					if(thread.replies < REPLY_LIMIT){
 						Reply.findById(replyid, 'date').then(newReply => 
-						Thread.findByIdAndUpdate(req.params.threadid, {replies: count, bump: newReply.date}))
-						.then(result => console.log(result));
+						Thread.findByIdAndUpdate(req.params.threadid, {bump: newReply.date}))
 					}
-					else{
-						Thread.findByIdAndUpdate(req.params.threadid, {replies: count})
-						.then(result => console.log(result));
-					}
+
 				});
 			});
 
