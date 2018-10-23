@@ -107,6 +107,5 @@ exports.reply_create_post = [
           });
       });
     }
-    return next();
   },
 ];

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const Board = require('./board');
 
-const { Schema } = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const ThreadSchema = new Schema(
   {

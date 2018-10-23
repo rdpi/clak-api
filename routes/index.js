@@ -17,7 +17,7 @@ router.post('/', indexController.create_board);
 router.get('/:boardid/thread/:threadid', threadController.thread_detail);
 
 // POST request for thread
-router.post('/:boardid/thread/:threadid', threadController.replyCreate_post);
+router.post('/:boardid/thread/:threadid', threadController.reply_create_post);
 
 // BOARD ROUTERS //
 

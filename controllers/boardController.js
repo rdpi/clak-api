@@ -46,6 +46,17 @@ exports.create_thread = [
 
   // process next request
   async (req, res, next) => {
+
+    // make sure the request is valid
+    const board = await Board.findOne({ 'uri': req.params.boardid });
+    if (board == null) {
+      const err = new Error();
+      err.status = 404;
+      err.message = 'Board not found';
+      return next(err);
+    }
+
+    // check validator for errors
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -69,6 +80,7 @@ exports.create_thread = [
           (error, result) => { console.log(result, error); }));
         console.log(req.files.file.originalFilename);
         const results = await Promise.all(promises);
+
         filedata.file_id = (results[0].public_id);
         filedata.filename = (req.files.file.originalFilename);
         filedata.filesize = (results[0].bytes);
@@ -80,10 +92,10 @@ exports.create_thread = [
         err.status = 501;
         return next(err);
       }
-      // Create new reply object with sanatized data
+      // Create new thread object with sanatized data
       const thread = new Thread(
         {
-          board: req.params.boardid,
+          board: board._id,
           name: req.body.name === '' ? 'Anonymous' : req.body.name,
           subject: req.body.subject,
           body: req.body.body,
@@ -97,17 +109,16 @@ exports.create_thread = [
       );
       thread.save((err) => {
         if (err) { return next(err); }
-
+        res.sendStatus(201);
         // prune last thread
-        return Thread.countDocuments({ board: req.params.boardid }, (err, count) => {
+        return Thread.countDocuments({ board: board._id }, (err, count) => {
           if (err) { return next(err); }
           if (count > THREAD_LIMIT) {
-            Thread.findOneAndDelete({ 'board': req.params.boardid }, { sort: { 'bump': 1 } }).exec();
+            Thread.findOneAndDelete({ 'board': board._id }, { sort: { 'bump': 1 } }).exec();
           }
           return count;
         });
       });
     }
-    return next();
   },
 ];
