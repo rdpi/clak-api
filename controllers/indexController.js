@@ -25,8 +25,8 @@ exports.create_board = [
   body('title').isLength({ max: 40 }).trim().withMessage('Too many characters'),
 
   // sanatize
-  sanitizeBody('uri').trim().escape(),
-  sanitizeBody('title').trim().escape(),
+  sanitizeBody('uri').trim(),
+  sanitizeBody('title').trim(),
 
   // process next request
   (req, res, next) => {

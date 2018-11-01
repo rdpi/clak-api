@@ -37,8 +37,8 @@ exports.reply_create_post = [
   body('name').isLength({ max: 30 }).trim().withMessage('Field too long'),
 
   // sanatize
-  sanitizeBody('name').trim().escape(),
-  sanitizeBody('body').trim().escape(),
+  sanitizeBody('name').trim(),
+  sanitizeBody('body').trim(),
 
   // process next request
   async (req, res, next) => {

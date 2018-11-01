@@ -40,9 +40,9 @@ exports.create_thread = [
   body('subject').isLength({ max: 100 }).trim().withMessage('Field too long'),
 
   // sanatize
-  sanitizeBody('name').trim().escape(),
-  sanitizeBody('subject').trim().escape(),
-  sanitizeBody('body').trim().escape(),
+  sanitizeBody('name').trim(),
+  sanitizeBody('subject').trim(),
+  sanitizeBody('body').trim(),
 
   // process next request
   async (req, res, next) => {
