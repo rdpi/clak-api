@@ -107,9 +107,9 @@ exports.create_thread = [
           ext: filedata.ext,
         },
       );
-      thread.save((err) => {
+      thread.save((err, newThread) => {
         if (err) { return next(err); }
-        res.sendStatus(201);
+        res.send({ status: '201', thread: newThread._id });
         // prune last thread
         return Thread.countDocuments({ board: board._id }, (err, count) => {
           if (err) { return next(err); }

@@ -44,9 +44,9 @@ exports.create_board = [
           title: req.body.title,
         },
       );
-      board.save((err) => {
+      board.save((err, newBoard) => {
         if (err) { return next(err); }
-        return res.sendStatus(201);
+        return res.send({ status: '201', board: newBoard.uri });
       });
     }
   },

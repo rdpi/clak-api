@@ -94,7 +94,6 @@ exports.reply_create_post = [
       );
       reply.save((err, replyid) => {
         if (err) { return next(err); }
-
         // update reply count
         return Thread.findByIdAndUpdate(req.params.threadid, { $inc: { replies: 1 } })
           .exec((err, thread) => {
@@ -103,7 +102,7 @@ exports.reply_create_post = [
             if (thread.replies < REPLY_LIMIT) {
               Reply.findById(replyid, 'date').then(newReply => Thread.findByIdAndUpdate(req.params.threadid, { bump: newReply.date }));
             }
-            return res.sendStatus(201);
+            return res.send({ status: '201', reply: replyid._id });
           });
       });
     }
