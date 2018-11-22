@@ -73,12 +73,9 @@ exports.create_thread = [
         height: null,
         ext: null,
       };
-      console.log(req.files);
       if (Object.keys(req.files).length !== 0) {
         const values = Object.values(req.files);
-        const promises = values.map(image => cloudinary.uploader.upload(image.path,
-          (error, result) => { console.log(result, error); }));
-        console.log(req.files.file.originalFilename);
+        const promises = values.map(image => cloudinary.uploader.upload(image.path);
         const results = await Promise.all(promises);
 
         filedata.file_id = (results[0].public_id);

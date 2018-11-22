@@ -33,7 +33,7 @@ exports.create_board = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      console.log(JSON.stringify(errors));
+      res.send(errors);
     } else {
       // Data is valid
 

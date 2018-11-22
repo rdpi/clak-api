@@ -45,7 +45,7 @@ exports.reply_create_post = [
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-      console.log(errors);
+      res.send(errors);
     } else {
       // Data is valid
 
@@ -61,9 +61,7 @@ exports.reply_create_post = [
 
       if (Object.keys(req.files).length !== 0) {
         const values = Object.values(req.files);
-        const promises = values.map(image => cloudinary.uploader.upload(image.path,
-          (error, result) => { console.log(result, error); }));
-        console.log(req.files.file.originalFilename);
+        const promises = values.map(image => cloudinary.uploader.upload(image.path);
         const results = await Promise.all(promises);
 
         filedata.file_id = (results[0].public_id);
