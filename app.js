@@ -9,7 +9,6 @@ const mongoose = require('mongoose');
 const formData = require('express-form-data');
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 
 const app = express();
 
@@ -31,7 +30,6 @@ app.use(formData.parse());
 app.use(cors());
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
