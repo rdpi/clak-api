@@ -1,5 +1,5 @@
 # clak-api
-RESTful nodejs backend for clak imageboard
+RESTful Node.js backend for clak imageboard
 
 ## Installation
 Using npm:
