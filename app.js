@@ -4,21 +4,11 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const mongoose = require('mongoose');
 const formData = require('express-form-data');
 
 const indexRouter = require('./routes/index');
 
 const app = express();
-
-// database
-const mongoDB = process.env.MONGO_DB;
-mongoose.set('useCreateIndex', true);
-mongoose.connect(mongoDB, { useNewUrlParser: true });
-mongoose.Promise = global.Promise;
-const db = mongoose.connection;
-db.on('error', console.log.bind(console, 'MongoDB connection'));
-
 
 app.use(logger('dev'));
 app.use(express.json());

@@ -1,0 +1,15 @@
+const { Sequelize, Model } = require('sequelize');
+
+const sequelize = new Sequelize(process.env.MYSQL_DB);
+
+class Board extends Model {}
+Board.init(
+  {
+    uri: {
+      type: Sequelize.STRING, unique: true, validate: { min: 1, max: 30 }, allowNull: false,
+    },
+    title: {
+      type: Sequelize.STRING, validate: { min: 1, max: 40 }, allowNull: false,
+    },
+  }, { sequelize, modelName: 'board' },
+);

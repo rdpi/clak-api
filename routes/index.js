@@ -1,30 +1,31 @@
 const express = require('express');
 
 const router = express.Router();
-const threadController = require('../controllers/threadController');
+// const replyController = require('../controllers/replyController');
+// const threadController = require('../controllers/boardController');
 const boardController = require('../controllers/boardController');
-const indexController = require('../controllers/indexController');
 
 /* GET home page. */
-router.get('/api/boards', indexController.get_boards);
+router.get('/boards', boardController.get_boards);
 
 /* Create new board */
-router.post('/api/boards', indexController.create_board);
+router.post('/boards', boardController.create_board);
 
 // THREAD ROUTERS //
 
 // GET request for thread
-router.get('/api/:boardid/thread/:threadid', threadController.thread_detail);
+// router.get('/api/:boardid/thread/:threadid', replyController.thread_detail);
 
 // POST request for thread
-router.post('/api/:boardid/thread/:threadid', threadController.reply_create_post);
+// router.post('/api/:boardid/thread/:threadid', replyController.reply_create_post);
 
 // BOARD ROUTERS //
 
 // GET request for thread
-router.get('/api/:boardid', boardController.get_threads);
+// router.get('/api/:boardid', threadController.get_threads);
 
 // POST request for thread
-router.post('/api/:boardid', boardController.create_thread);
+// router.post('/api/:boardid', threadController.create_thread);
+
 
 module.exports = router;
