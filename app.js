@@ -4,21 +4,14 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const mongoose = require('mongoose');
 const formData = require('express-form-data');
+const cors = require('cors');
 
-const indexRouter = require('./routes/index');
+const boardRouter = require('./routes/board');
+const threadRouter = require('./routes/thread');
+const replyRouter = require('./routes/reply');
 
 const app = express();
-
-// database
-const mongoDB = process.env.MONGO_DB;
-mongoose.set('useCreateIndex', true);
-mongoose.connect(mongoDB, { useNewUrlParser: true });
-mongoose.Promise = global.Promise;
-const db = mongoose.connection;
-db.on('error', console.log.bind(console, 'MongoDB connection'));
-
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -26,8 +19,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(formData.parse());
+app.use(cors());
 
-app.use('/', indexRouter);
+app.use('/', replyRouter);
+app.use('/', threadRouter);
+app.use('/', boardRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -40,7 +36,7 @@ app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // send error
   res.status(err.status || 500).send(err);
 });
 
