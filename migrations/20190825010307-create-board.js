@@ -6,23 +6,28 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       uri: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(30),
       },
       title: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(40),
+      },
+      posts: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
-    });
+    }, {timestamps: true});
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Boards');
